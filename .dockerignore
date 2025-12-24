@@ -1,0 +1,51 @@
+# Virtual environment
+venv/
+env/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Environment variables (will use .env.example instead)
+.env
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+README.md
+README
+
+# Uploads directory (mounted as volume in production)
+uploads/*
+models_cache/*
+
+# macOS
+.DS_Store
+
+# Claude
+.claude/
+
+# Logs
+*.log
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Shell scripts (not needed in container)
+run.sh
