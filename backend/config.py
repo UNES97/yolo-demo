@@ -31,11 +31,7 @@ class Settings(BaseSettings):
 
     # CORS
     ALLOWED_ORIGINS: Union[List[str], str] = [
-        "http://localhost:8888",  # MAMP default
-        "http://localhost:8010",  # FastAPI server
-        "http://127.0.0.1:8888",
-        "http://127.0.0.1:8010",
-        "http://localhost:3000",  # Development frontend
+        "*"  # Allow all origins by default
     ]
 
     # File Upload
