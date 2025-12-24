@@ -37,13 +37,13 @@ RUN mkdir -p uploads models_cache
 # The model will be cached in the models_cache directory (mounted as volume)
 
 # Expose the port the app runs on
-EXPOSE 3000
+EXPOSE 8765
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
-ENV PORT=3000
+ENV PORT=8765
 ENV HOST=0.0.0.0
 ENV DEBUG=false
 
 # Run the FastAPI application
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "3000"]
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8765"]

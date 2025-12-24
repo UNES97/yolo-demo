@@ -4,13 +4,13 @@
 
 ### 1. Port Configuration
 In your Coolify application settings:
-- **Ports Exposes**: `3000`
-- **Ports Mappings**: Leave **EMPTY** (Coolify's reverse proxy handles routing)
+- **Ports Exposes**: `8765`
+- **Ports Mappings**: `8765:8765` (if required by Coolify UI)
 
 ### 2. Environment Variables
 Add these in Coolify's Environment Variables section:
 ```
-PORT=3000
+PORT=8765
 HOST=0.0.0.0
 DEBUG=false
 ALLOWED_ORIGINS=*
@@ -18,7 +18,7 @@ ALLOWED_ORIGINS=*
 
 ### 3. Health Check
 - **Health Check Path**: `/health`
-- **Health Check Port**: `3000`
+- **Health Check Port**: `8765`
 - **Health Check Method**: `GET`
 
 ### 4. Domain Configuration
@@ -43,8 +43,8 @@ This means Coolify's reverse proxy cannot reach your container. Follow these ste
 
 #### Step 1: Verify Port Configuration
 In Coolify → Your App → **Service** tab:
-- **Ports Exposes**: Must be `3000` (just the number)
-- **Ports Mappings**: Must be **EMPTY** (do NOT add port mappings - Coolify's reverse proxy handles this)
+- **Ports Exposes**: Must be `8765` (just the number)
+- **Ports Mappings**: `8765:8765` (or whatever Coolify automatically sets)
 
 #### Step 2: Check Domain Setup
 In Coolify → Your App → **Domains** tab:
@@ -54,7 +54,7 @@ In Coolify → Your App → **Domains** tab:
 
 #### Step 3: Verify Application Settings
 In Coolify → Your App → **General** tab:
-- **Port**: Should show `3000`
+- **Port**: Should show `8765`
 - **Dockerfile Location**: `Dockerfile` or `./Dockerfile`
 - **Build Pack**: `Dockerfile`
 - **Base Directory**: `/` (or empty)
@@ -63,7 +63,7 @@ In Coolify → Your App → **General** tab:
 In Coolify → Your App → **Logs** tab, you should see:
 ```
 Starting YOLO Object Detection API
-API running at: http://0.0.0.0:3000
+API running at: http://0.0.0.0:8765
 ```
 
 If you see this, the app IS running but Coolify routing is broken.
@@ -88,8 +88,8 @@ Expected responses:
 #### Step 6: If Still 404 - Nuclear Option
 1. **Stop** the application in Coolify
 2. In **Service** tab, verify:
-   - **Ports Exposes**: `3000`
-   - **Ports Mappings**: **EMPTY** (remove any mappings)
+   - **Ports Exposes**: `8765`
+   - **Ports Mappings**: `8765:8765`
 3. **Redeploy** (click Deploy button)
 4. Wait for build to complete
 5. Check logs for startup message
@@ -97,8 +97,8 @@ Expected responses:
 If still broken:
 1. **Delete** the application in Coolify
 2. **Create new** application from scratch
-3. During setup, ensure Port is set to `3000`
-4. Leave Ports Mappings EMPTY
+3. During setup, ensure Port is set to `8765`
+4. Let Coolify auto-set Ports Mappings
 5. Generate domain before first deployment
 
 ### Common Issues
@@ -116,10 +116,10 @@ Before deploying to Coolify, test locally:
 docker build -t yolo-app .
 
 # Run the container
-docker run -p 3000:3000 yolo-app
+docker run -p 8765:8765 yolo-app
 
 # Test
-curl http://localhost:3000/health
+curl http://localhost:8765/health
 ```
 
 ## Additional Resources
