@@ -37,30 +37,66 @@ Add persistent volumes:
 
 ## Troubleshooting
 
-### "404 page not found" Error
+### "404 page not found" on ALL Endpoints
 
-1. **Check Application Logs**:
-   - In Coolify, go to your application → Logs
-   - Look for startup messages and errors
-   - You should see: "Starting YOLO Object Detection API"
+This means Coolify's reverse proxy cannot reach your container. Follow these steps:
 
-2. **Verify Port**:
-   - Ensure port 8010 is configured in Coolify
-   - Check that the container is listening on 0.0.0.0:8010
+#### Step 1: Verify Port Configuration
+In Coolify → Your App → **Service** tab:
+- **Ports Exposes**: Must be `8010` (just the number)
+- **Ports Mappings**: Leave **EMPTY** or `8010:8010`
 
-3. **Test Health Endpoint**:
-   ```bash
-   curl http://your-domain/health
-   ```
-   Should return: `{"status":"ok"}`
+#### Step 2: Check Domain Setup
+In Coolify → Your App → **Domains** tab:
+- Must have at least one domain configured
+- If empty, click **"Generate Domain"**
+- Note the full URL (e.g., `http://yourapp.server.com`)
 
-4. **Check Container Status**:
-   - Make sure the container is running
-   - Check if health checks are passing
+#### Step 3: Verify Application Settings
+In Coolify → Your App → **General** tab:
+- **Port**: Should show `8010`
+- **Dockerfile Location**: `Dockerfile` or `./Dockerfile`
+- **Build Pack**: `Dockerfile`
+- **Base Directory**: `/` (or empty)
 
-5. **Review Build Logs**:
-   - Ensure the Docker build completed successfully
-   - Check for any package installation errors
+#### Step 4: Check Application Logs
+In Coolify → Your App → **Logs** tab, you should see:
+```
+Starting YOLO Object Detection API
+API running at: http://0.0.0.0:8010
+```
+
+If you see this, the app IS running but Coolify routing is broken.
+
+#### Step 5: Test Endpoints
+Try these URLs (replace with your actual domain):
+```bash
+# Simple health check
+curl http://your-domain/health
+
+# Test endpoint with debug info
+curl http://your-domain/test
+
+# API docs
+curl http://your-domain/docs
+```
+
+Expected responses:
+- `/health` → `{"status":"ok"}`
+- `/test` → `{"status":"working","message":"If you see this, the app is running!",...}`
+
+#### Step 6: If Still 404 - Nuclear Option
+1. **Stop** the application in Coolify
+2. In **Service** tab, verify Port is `8010`
+3. **Redeploy** (click Deploy button)
+4. Wait for build to complete
+5. Check logs for startup message
+
+If still broken:
+1. **Delete** the application in Coolify
+2. **Create new** application from scratch
+3. During setup, ensure Port is set to `8010`
+4. Generate domain before first deployment
 
 ### Common Issues
 

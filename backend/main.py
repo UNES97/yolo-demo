@@ -87,6 +87,18 @@ async def root_health_check():
     """Simple health check for container orchestration platforms"""
     return {"status": "ok"}
 
+@app.get("/test")
+async def test_endpoint():
+    """Test endpoint to verify routing"""
+    import os
+    return {
+        "status": "working",
+        "message": "If you see this, the app is running!",
+        "host": os.getenv("HOST", "not set"),
+        "port": os.getenv("PORT", "not set"),
+        "debug": os.getenv("DEBUG", "not set")
+    }
+
 # Include routers
 app.include_router(health.router)
 app.include_router(detection.router)
