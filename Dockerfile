@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     libxrender-dev \
     libgomp1 \
     libgl1-mesa-glx \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for better Docker caching
@@ -25,10 +26,12 @@ RUN pip install --no-cache-dir --upgrade pip && \
 COPY backend/ ./backend/
 COPY frontend/ ./frontend/
 COPY .env.example .env
-COPY yolov8n.pt ./yolov8n.pt
 
 # Create necessary directories
 RUN mkdir -p uploads models_cache
+
+# Note: YOLO model (yolov8n.pt) will be downloaded automatically on first run
+# The model will be cached in the models_cache directory (mounted as volume)
 
 # Expose the port the app runs on
 EXPOSE 8010
