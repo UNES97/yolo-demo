@@ -4,13 +4,13 @@
 
 ### 1. Port Configuration
 In your Coolify application settings:
-- **Ports Exposes**: `8010`
-- **Ports Mappings**: Leave empty (Coolify will auto-map)
+- **Ports Exposes**: `8000`
+- **Ports Mappings**: `8010:8000` (external:internal)
 
 ### 2. Environment Variables
 Add these in Coolify's Environment Variables section:
 ```
-PORT=8010
+PORT=8000
 HOST=0.0.0.0
 DEBUG=false
 ALLOWED_ORIGINS=*
@@ -18,7 +18,7 @@ ALLOWED_ORIGINS=*
 
 ### 3. Health Check
 - **Health Check Path**: `/health`
-- **Health Check Port**: `8010`
+- **Health Check Port**: `8000`
 - **Health Check Method**: `GET`
 
 ### 4. Domain Configuration
@@ -43,8 +43,8 @@ This means Coolify's reverse proxy cannot reach your container. Follow these ste
 
 #### Step 1: Verify Port Configuration
 In Coolify → Your App → **Service** tab:
-- **Ports Exposes**: Must be `8010` (just the number)
-- **Ports Mappings**: Leave **EMPTY** or `8010:8010`
+- **Ports Exposes**: Must be `8000` (just the number)
+- **Ports Mappings**: `8010:8000` (external port 8010 → internal port 8000)
 
 #### Step 2: Check Domain Setup
 In Coolify → Your App → **Domains** tab:
@@ -54,7 +54,7 @@ In Coolify → Your App → **Domains** tab:
 
 #### Step 3: Verify Application Settings
 In Coolify → Your App → **General** tab:
-- **Port**: Should show `8010`
+- **Port**: Should show `8000`
 - **Dockerfile Location**: `Dockerfile` or `./Dockerfile`
 - **Build Pack**: `Dockerfile`
 - **Base Directory**: `/` (or empty)
@@ -63,7 +63,7 @@ In Coolify → Your App → **General** tab:
 In Coolify → Your App → **Logs** tab, you should see:
 ```
 Starting YOLO Object Detection API
-API running at: http://0.0.0.0:8010
+API running at: http://0.0.0.0:8000
 ```
 
 If you see this, the app IS running but Coolify routing is broken.
@@ -87,7 +87,9 @@ Expected responses:
 
 #### Step 6: If Still 404 - Nuclear Option
 1. **Stop** the application in Coolify
-2. In **Service** tab, verify Port is `8010`
+2. In **Service** tab, verify:
+   - **Ports Exposes**: `8000`
+   - **Ports Mappings**: `8010:8000`
 3. **Redeploy** (click Deploy button)
 4. Wait for build to complete
 5. Check logs for startup message
@@ -95,8 +97,9 @@ Expected responses:
 If still broken:
 1. **Delete** the application in Coolify
 2. **Create new** application from scratch
-3. During setup, ensure Port is set to `8010`
-4. Generate domain before first deployment
+3. During setup, ensure Port is set to `8000`
+4. Set Ports Mappings to `8010:8000`
+5. Generate domain before first deployment
 
 ### Common Issues
 
@@ -113,7 +116,7 @@ Before deploying to Coolify, test locally:
 docker build -t yolo-app .
 
 # Run the container
-docker run -p 8010:8010 yolo-app
+docker run -p 8010:8000 yolo-app
 
 # Test
 curl http://localhost:8010/health
