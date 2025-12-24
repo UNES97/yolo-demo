@@ -12,6 +12,7 @@ class YOLOApp {
         this.uploadModeContent = document.getElementById('uploadModeContent');
         this.startCameraBtn = document.getElementById('startCamera');
         this.stopCameraBtn = document.getElementById('stopCamera');
+        this.switchCameraBtn = document.getElementById('switchCamera');
         this.captureFrameBtn = document.getElementById('captureFrame');
         this.cameraStatus = document.getElementById('cameraStatus');
         this.confidenceSlider = document.getElementById('confidenceSlider');
@@ -66,6 +67,7 @@ class YOLOApp {
         // Camera controls
         this.startCameraBtn.addEventListener('click', () => this.startCamera());
         this.stopCameraBtn.addEventListener('click', () => this.stopCamera());
+        this.switchCameraBtn.addEventListener('click', () => this.switchCamera());
         this.captureFrameBtn.addEventListener('click', () => this.detectFrame());
 
         // Confidence slider
@@ -135,8 +137,11 @@ class YOLOApp {
             // Update UI
             this.startCameraBtn.style.display = 'none';
             this.stopCameraBtn.style.display = 'inline-block';
+            this.switchCameraBtn.style.display = 'inline-block';
             this.captureFrameBtn.style.display = 'inline-block';
-            this.showStatus('Camera started successfully', 'success');
+
+            const cameraType = cameraHandler.getFacingMode() === 'environment' ? 'Back' : 'Front';
+            this.showStatus(`${cameraType} camera started successfully`, 'success');
 
             // Start auto-detection if enabled
             if (this.autoDetectCheckbox.checked) {
@@ -159,9 +164,33 @@ class YOLOApp {
         // Update UI
         this.startCameraBtn.style.display = 'inline-block';
         this.stopCameraBtn.style.display = 'none';
+        this.switchCameraBtn.style.display = 'none';
         this.captureFrameBtn.style.display = 'none';
         this.showStatus('Camera stopped', 'success');
         this.hideResults();
+    }
+
+    /**
+     * Switch camera (front/back)
+     */
+    async switchCamera() {
+        try {
+            this.showLoading();
+            const newFacingMode = await cameraHandler.switchCamera();
+
+            const cameraType = newFacingMode === 'environment' ? 'Back' : 'Front';
+            this.showStatus(`Switched to ${cameraType} camera`, 'success');
+
+            // Restart auto-detection if it was running
+            if (this.autoDetectCheckbox.checked) {
+                this.startAutoDetection();
+            }
+
+            this.hideLoading();
+        } catch (error) {
+            this.hideLoading();
+            this.showError(`Failed to switch camera: ${error.message}`);
+        }
     }
 
     /**

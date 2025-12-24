@@ -14,6 +14,7 @@ class CameraHandler {
         this.lastFrameTime = 0;
         this.frameCount = 0;
         this.fps = 0;
+        this.facingMode = 'environment'; // Default to back camera (environment)
     }
 
     /**
@@ -52,12 +53,12 @@ class CameraHandler {
             }
 
             // Request camera access
-            console.log('Requesting camera access...');
+            console.log('Requesting camera access with facingMode:', this.facingMode);
             this.stream = await navigator.mediaDevices.getUserMedia({
                 video: {
                     width: { ideal: 1280 },
                     height: { ideal: 720 },
-                    facingMode: 'user'
+                    facingMode: this.facingMode
                 },
                 audio: false
             });
@@ -270,6 +271,34 @@ class CameraHandler {
      */
     getFPS() {
         return this.fps;
+    }
+
+    /**
+     * Switch between front and back camera
+     */
+    async switchCamera() {
+        const wasRunning = this.isRunning;
+
+        if (wasRunning) {
+            this.stop();
+        }
+
+        // Toggle facing mode
+        this.facingMode = this.facingMode === 'user' ? 'environment' : 'user';
+        console.log('Switching to camera:', this.facingMode);
+
+        if (wasRunning) {
+            await this.start();
+        }
+
+        return this.facingMode;
+    }
+
+    /**
+     * Get current facing mode
+     */
+    getFacingMode() {
+        return this.facingMode;
     }
 }
 
