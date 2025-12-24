@@ -14,9 +14,9 @@ class Settings(BaseSettings):
 
     # Application
     APP_NAME: str = "YOLO Object Detection API"
-    DEBUG: bool = True
+    DEBUG: bool = False
     HOST: str = "0.0.0.0"
-    PORT: int = 8000
+    PORT: int = 8010
 
     # Model Configuration
     YOLO_MODEL: str = "yolov8n.pt"  # yolov8n.pt (fastest), yolov8s.pt, yolov8m.pt, etc.

@@ -41,6 +41,9 @@ EXPOSE 8010
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
+ENV PORT=8010
+ENV HOST=0.0.0.0
+ENV DEBUG=false
 
 # Run the FastAPI application
 CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8010"]

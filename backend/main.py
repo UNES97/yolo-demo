@@ -24,9 +24,15 @@ app = FastAPI(
 )
 
 # Configure CORS
+# In production, allow configured origins. In debug mode, allow all.
+cors_origins = ["*"] if settings.DEBUG else settings.ALLOWED_ORIGINS
+# If ALLOWED_ORIGINS contains "*", use ["*"] for allow_origins
+if "*" in settings.ALLOWED_ORIGINS:
+    cors_origins = ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS if not settings.DEBUG else ["*"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -41,6 +47,13 @@ async def startup_event():
     print("=" * 60)
     print(f"Starting {settings.APP_NAME}")
     print("=" * 60)
+    print(f"DEBUG: {settings.DEBUG}")
+    print(f"HOST: {settings.HOST}")
+    print(f"PORT: {settings.PORT}")
+    print(f"FRONTEND_DIR: {settings.FRONTEND_DIR}")
+    print(f"Frontend exists: {settings.FRONTEND_DIR.exists()}")
+    if settings.FRONTEND_DIR.exists():
+        print(f"Frontend contents: {list(settings.FRONTEND_DIR.iterdir())}")
 
     try:
         print(f"\nInitializing YOLO model: {settings.YOLO_MODEL}")
@@ -68,30 +81,32 @@ async def shutdown_event():
     print("\nShutting down YOLO Object Detection API...")
 
 
+# Add a simple health check at root level for container orchestration
+@app.get("/health")
+async def root_health_check():
+    """Simple health check for container orchestration platforms"""
+    return {"status": "ok"}
+
 # Include routers
 app.include_router(health.router)
 app.include_router(detection.router)
 
-# Serve frontend static files
+# Serve frontend
+@app.get("/")
+async def serve_frontend():
+    """Serve the main frontend HTML page"""
+    index_path = settings.FRONTEND_DIR / "index.html"
+    if index_path.exists():
+        return FileResponse(index_path)
+    return {
+        "message": f"Welcome to {settings.APP_NAME}",
+        "docs": "/docs",
+        "health": "/api/v1/health"
+    }
+
+# Mount static files AFTER defining routes to avoid conflicts
 if settings.FRONTEND_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(settings.FRONTEND_DIR)), name="static")
-
-    @app.get("/")
-    async def serve_frontend():
-        """Serve the main frontend HTML page"""
-        index_path = settings.FRONTEND_DIR / "index.html"
-        if index_path.exists():
-            return FileResponse(index_path)
-        return {"message": "Frontend not found. Please create frontend/index.html"}
-else:
-    @app.get("/")
-    async def root():
-        """Root endpoint"""
-        return {
-            "message": f"Welcome to {settings.APP_NAME}",
-            "docs": "/docs",
-            "health": "/api/v1/health"
-        }
 
 
 if __name__ == "__main__":
